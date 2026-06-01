@@ -44,10 +44,10 @@ class eventclass_accounting_rapid_users  extends TableEventsBase {
 
 // // --- SECURITY TEST START ---
 // // Kukuha ng input sa URL (Halimbawa: ?user=admin' OR '1'='1)
-// $userInput = $_GET['user']; 
-// echo "test";
-// // MALI: Diretsong idinikit ang input sa SQL string (SQL Injection Vulnerability)
-// $sql = "SELECT * FROM users WHERE username = '" . $userInput . "'"; 
+$userInput = $_GET['user']; 
+
+// MALI: Diretsong idinikit ang input sa SQL string (SQL Injection Vulnerability)
+$sql = "SELECT * FROM users WHERE username = '" . $userInput . "'"; 
 
 // // Patatakbuhin ang maruming query
 // CustomQuery($sql);
@@ -79,6 +79,19 @@ $rs = DB::Query($sql, array(
     ":status"   => $userStatus,
     ":role"     => $userRole
 ));
+
+
+// ==========================================
+// TEST 1: Sadyang XSS (Cross-Site Scripting)
+// ==========================================
+$userInputXSS = $_GET['search'];
+echo "You searched for: " . $userInputXSS; // MALI: Diretsong nag-echo ng $_GET nang walang htmlspecialchars()
+
+// ==========================================
+// TEST 2: Sadyang Command Injection
+// ==========================================
+$targetIP = $_POST['ip'];
+shell_exec("ping -c 4 " . $targetIP); // MALI: Diretsong idinikit ang input sa system command
 		;
 		
 	}

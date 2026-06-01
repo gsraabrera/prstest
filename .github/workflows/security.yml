@@ -1,4 +1,4 @@
-name: PHPRunner Security Scan
+name: PHPRunner Security Scan (Semgrep)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  phprunner-scan:
+  security-scan:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,53 +17,18 @@ jobs:
       with:
         fetch-depth: 0
 
-    # STEP 2: Secret Scanning (TruffleHog) - Para sa database passwords
+    # STEP 2: Secret Scanning (TruffleHog) - Hahanap ng passwords/credentials
     - name: Secret Scanning (TruffleHog)
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
         base: ""
 
-    # STEP 3: Setup PHP Environment
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.1'
-        coverage: none
-        tools: phpstan
-
-    # STEP 4: Patakbuhin ang Static Analysis sa mga Custom Events at Functions
-    - name: Run Static Analysis on Custom Functions
+    # STEP 3: Semgrep Security Scan (Dito natin huhulihin ang SQL Injection)
+    - name: Run Semgrep (SQLi & Security Audit)
       run: |
-        cat << 'EOF' > phpstan.neon
-        parameters:
-          level: 0  
-          
-          paths:
-            - include
-          
-          scanDirectories:
-            - classes
-            - include
-            - .
-          
-          # Dito natin sasaluhin lahat ng ingay na walang kinalaman sa Security
-          ignoreErrors:
-            - '#Undefined variable:.*#'
-            - '#Variable \$.* might not be defined\.#'
-            - '#class PhpOffice\\.* not found#'
-            - '#class Facebook.* not found#'
-            - '#unknown class PhpOffice\\.*#'
-            - '#unknown class Facebook.*#'
-            - '#Class XTempl referenced with incorrect case.*#'
-            - '#Method MenuItem::.*#'
-            
-          # Siguraduhin na hindi mag-e-error si PHPStan kung walang nag-match sa ignore list
-          reportUnmatchedIgnoredErrors: false
-          
-          excludePaths:
-            - include/lang/*
-            - include/dal/*
-        EOF
-        
-        phpstan analyse --error-format=github
+        docker run --rm -v "${{ github.workspace }}:/src" returntocorp/semgrep semgrep scan \
+          --config="p/php" \
+          --config="p/owasp-top-10" \
+          --include="include" \
+          --error

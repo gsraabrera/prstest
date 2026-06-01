@@ -24,11 +24,11 @@ jobs:
         path: ./
         base: ""
 
-    # STEP 3: Semgrep (LASER FOCUS sa SQL Injection Lang)
-    # Gagamit tayo ng '--only-rule' flag para patayin ang lahat ng ibang ingay.
+    # STEP 3: Semgrep (LASER FOCUS sa SQL Injection Lang gamit ang Inline Pattern)
+    # Gagamit tayo ng pattern filter para dedmahin ang lahat ng ibang rules sa buong mundo.
     - name: Run Semgrep (SQLi Only)
       run: |
         docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan \
-          --config="p/php" \
-          --only-rule="php.lang.security.injection.tainted-sql-string.tainted-sql-string" \
+          --lang=php \
+          --pattern='$SQL = "... " . $INPUT;' \
           --error

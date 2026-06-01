@@ -24,20 +24,27 @@ jobs:
         path: ./
         base: ""
 
-    # STEP 3: Semgrep (LASER FOCUS sa SQL Injection Lang gamit ang Generic Rules Filter)
-    # Patatakbuhin natin ang buong p/php ruleset pero gagamit tayo ng 'grep' para saluhin lang
-    # ang mga errors na may kinalaman sa SQL injection.
+    # STEP 3: Semgrep (LASER FOCUS sa SQL Injection Lang na may Kumpletong Detalye)
     - name: Run Semgrep (SQLi Only)
       run: |
+        # Patakbuhin si Semgrep at i-save ang buong text report
         docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan \
           --config="p/php" \
           --text \
           > semgrep_results.txt || true
         
-        # Dito natin sasalain: I-print lang ang mga linya kung nasaan ang SQL Injection
         echo "=== SQL INJECTION SCAN RESULTS ==="
-        if grep -A 5 -B 2 "tainted-sql-string" semgrep_results.txt; then
-          echo "❌ ERROR: May nakitang SQL Injection sa code mo! Pakiaayos bago mag-deploy."
+        
+        # Titingnan kung may 'tainted-sql-string' sa resulta
+        if grep -q "tainted-sql-string" semgrep_results.txt; then
+          echo "❌ ERROR: May nakitang SQL Injection sa code mo!"
+          echo "--------------------------------------------------------"
+          
+          # Hahanapin ang bawat block ng SQL Injection at ipapakita ang detalye (30 lines after ng filename)
+          grep -B 1 -A 25 "tainted-sql-string" semgrep_results.txt
+          
+          echo "--------------------------------------------------------"
+          echo "Aksyon: Pakiaayos ang query sa itaas bago mag-deploy."
           exit 1
         else
           echo "✅ SQL Injection Scan Passed! Ligtas ang custom code mo."

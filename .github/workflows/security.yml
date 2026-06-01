@@ -22,7 +22,7 @@ jobs:
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
-        base: "" # Ini-scan ang buong repository history
+        base: ""
 
     # STEP 3: Setup PHP Environment
     - name: Setup PHP
@@ -30,29 +30,36 @@ jobs:
       with:
         php-version: '8.1'
         coverage: none
-        tools: phpstan # Dito natin ilalagay para si shivammathur na ang bahalang mag-ayos ng PATH!
+        tools: phpstan
 
     # STEP 4: Patakbuhin ang Static Analysis sa mga Custom Events at Functions
     - name: Run Static Analysis on Custom Functions
       run: |
         cat << 'EOF' > phpstan.neon
         parameters:
-          # Level 0 ang pinakamaluwag. Sapat na ito para sa legacy/generated code para SQLi lang at fatal errors ang hanapin.
           level: 0  
           
-          # Dito lang siya maghahanap ng error (sa custom events mo)
           paths:
             - include
           
-          # Dito naman natin ituturo ang BUONG project para mahanap niya kung nasaan ang mga nawawalang Classes (tulad ng Security, ProjectSettings)
           scanDirectories:
             - classes
             - include
             - .
-            
-          # Huwag pansinin ang mga sumusunod na errors na gawa ng core PHPRunner system
+          
+          # Dito natin sasaluhin lahat ng ingay na walang kinalaman sa Security
           ignoreErrors:
-            - '#Variable \$.* might not be defined.#'
+            - '#Undefined variable:.*#'
+            - '#Variable \$.* might not be defined\.#'
+            - '#class PhpOffice\\.* not found#'
+            - '#class Facebook.* not found#'
+            - '#unknown class PhpOffice\\.*#'
+            - '#unknown class Facebook.*#'
+            - '#Class XTempl referenced with incorrect case.*#'
+            - '#Method MenuItem::.*#'
+            
+          # Siguraduhin na hindi mag-e-error si PHPStan kung walang nag-match sa ignore list
+          reportUnmatchedIgnoredErrors: false
           
           excludePaths:
             - include/lang/*

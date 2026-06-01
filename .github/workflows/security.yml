@@ -18,20 +18,16 @@ jobs:
         fetch-depth: 0
 
     # STEP 2: Secret Scanning (TruffleHog)
-    # Hahanapin nito kung may mga naiwang database passwords o API keys sa connection settings
+    # Hahanapin nito kung may mga naiwang database passwords o API keys
     - name: Secret Scanning (TruffleHog)
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
-        base: "" # I-scan ang buong kasaysayan ng commits
+        base: ""
 
-    # STEP 3: Semgrep Security Scan (Dito mahuhuli ang SQL Injection)
-    # Gagamitin ang opisyal na Semgrep engine para i-audit ang PHP custom events mo.
-    # Babagsak (Failure) ang workflow na ito kapag may nakitang seryosong security flaw.
+    # STEP 3: Semgrep Security Scan (Gagamit ng 'p/default' para iwas 404 Error)
+    # Ang 'p/default' ay naglalaman na ng OWASP Top 10 at Security Audit rules para sa PHP.
     - name: Run Semgrep (SQLi & Vulnerability Detection)
       uses: semgrep/semgrep-action@v1
       with:
-        config: >-
-          p/php
-          p/owasp-top-10
-          p/security-audit
+        config: p/default

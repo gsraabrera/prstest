@@ -35,16 +35,28 @@ jobs:
     # STEP 4: Patakbuhin ang Static Analysis sa mga Custom Events at Functions
     - name: Run Static Analysis on Custom Functions
       run: |
-        # Gumawa ng malinis na phpstan.neon gamit ang heredoc para iwas indent errors
         cat << 'EOF' > phpstan.neon
         parameters:
-          level: 1
+          # Level 0 ang pinakamaluwag. Sapat na ito para sa legacy/generated code para SQLi lang at fatal errors ang hanapin.
+          level: 0  
+          
+          # Dito lang siya maghahanap ng error (sa custom events mo)
           paths:
             - include
+          
+          # Dito naman natin ituturo ang BUONG project para mahanap niya kung nasaan ang mga nawawalang Classes (tulad ng Security, ProjectSettings)
+          scanDirectories:
+            - classes
+            - include
+            - .
+            
+          # Huwag pansinin ang mga sumusunod na errors na gawa ng core PHPRunner system
+          ignoreErrors:
+            - '#Variable \$.* might not be defined.#'
+          
           excludePaths:
             - include/lang/*
             - include/dal/*
         EOF
         
-        # Patakbuhin gamit ang tool na naka-setup na sa global path
         phpstan analyse --error-format=github

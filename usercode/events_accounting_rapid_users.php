@@ -61,6 +61,24 @@ $sql = "SELECT * FROM users WHERE username = :1 AND status = :2";
 
 // Ipinapasa ang mga variables ayon sa pagkakasunod-sunod ng numero
 $rs = DB::Query($sql, array($userInput, $userStatus));
+
+
+$userInput = $_GET['user'];
+$userStatus = 'Active';
+$userRole = 'Admin';
+
+// Mas madaling i-maintain kahit abutin ng 100 lines ang query mo
+$sql = "SELECT * FROM users 
+        WHERE username = :username 
+          AND status = :status 
+          AND role = :role";
+
+// Gumamit ng associative array para itugma ang mga pangalan
+$rs = DB::Query($sql, array(
+    ":username" => $userInput,
+    ":status"   => $userStatus,
+    ":role"     => $userRole
+));
 		;
 		
 	}

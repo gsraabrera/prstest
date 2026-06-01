@@ -1,0 +1,52 @@
+name: PHPRunner Security Scan
+
+on:
+  push:
+    branches: [ "test" ]
+  pull_request:
+    branches: [ "test" ]
+
+jobs:
+  phprunner-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    # STEP 1: I-download ang code mula sa GitHub
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # STEP 2: Secret Scanning (TruffleHog) - Bantayan ang mga database passwords sa connections ng PHPRunner
+    - name: Secret Scanning (TruffleHog)
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+
+    # STEP 3: Setup PHP Environment
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1' # Madalas 8.1 o 8.2 ang gamit ng PHPRunner ngayon
+        coverage: none
+
+    # STEP 4: I-install ang PHPStan (Dahil walang composer.json ang output ng PHPRunner, i-i-install natin ito globally)
+    - name: Install PHPStan
+      run: composer global require phpstan/phpstan --no-progress
+
+    # STEP 5: Patakbuhin ang Sniper Scan sa mga Custom Events at Functions mo lang
+    - name: Run Static Analysis on Custom Functions
+      run: |
+        # Gagawa tayo ng configuration file para sabihing huwag i-scan ang buong repo, kundi ang custom elements lang
+        echo "parameters:" > phpstan.neon
+        echo "  level: 4" >> phpstan.neon
+        echo "  paths:" >> phpstan.neon
+        # Ituturo natin ang include folder kung saan naroon ang mga events at custom_functions.php
+        echo "    - include" >> phpstan.neon 
+        echo "  excludePaths:" >> phpstan.neon
+        # I-exclude natin ang mga auto-generated configuration at language files para hindi mag-error
+        echo "    - include/lang/*" >> phpstan.neon
+        echo "    - include/dal/*" >> phpstan.neon
+        
+        # Patakbuhin ang global phpstan package laban sa neon file natin
+        ~/.composer/vendor/bin/phpstan analyse

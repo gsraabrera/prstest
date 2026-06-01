@@ -54,12 +54,13 @@ class eventclass_accounting_rapid_users  extends TableEventsBase {
 // // --- SECURITY TEST END ---
 
 $userInput = $_GET['user'];
+$userStatus = 'Active';
 
-// Gumamit ng :string o :s depende sa structure, o kaya ay array binding:
-$rs = DB::Query("SELECT * FROM users WHERE username = '" . db_escape($userInput) . "'");
+// Ligtas, madaling basahin, at walang concatenation (.)
+$sql = "SELECT * FROM users WHERE username = :1 AND status = :2";
 
-// O kaya ang mas modernong paraan ng PHPRunner (Prepared Statement Style):
-$rs = DB::Select("users", array("username" => $userInput));
+// Ipinapasa ang mga variables ayon sa pagkakasunod-sunod ng numero
+$rs = DB::Query($sql, array($userInput, $userStatus));
 		;
 		
 	}

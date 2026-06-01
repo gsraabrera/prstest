@@ -1,0 +1,309 @@
+{
+	"programVersion": 4,
+	"versionName": "11.3",
+	"name": "newphprunnertest",
+	"mainDiagram": {
+		"tables": [
+			{
+				"gid": 942436689,
+				"y": 10,
+				"x": 20,
+				"width": 260.375,
+				"height": 320
+			}
+		]
+	},
+	"securitySettings": {
+		"providers": [
+			{
+				"type": "%hardcoded",
+				"name": "hardcoded",
+				"active": false,
+				"label": {
+					"text": "Hardcoded",
+					"type": 0
+				},
+				"code": "00",
+				"username": "",
+				"password": ""
+			},
+			{
+				"type": "%db",
+				"name": "db",
+				"active": false,
+				"label": {
+					"text": "Database",
+					"type": 0
+				},
+				"code": "01",
+				"table": {
+					"connId": "",
+					"table": ""
+				},
+				"usernameField": null,
+				"passwordField": null,
+				"emailField": null,
+				"extUserIdField": null,
+				"fullnameField": null,
+				"userpicField": null
+			}
+		],
+		"sessionControl": {
+			"lifeTime": 15,
+			"sessionName": "LUMSvdfAfPIplWUNhCSJ",
+			"JWTSecret": "87VRe0oAdQgsH79q5ySK"
+		},
+		"registration": {
+			"remindMethod": 0,
+			"hashAlgorithm": 0,
+			"passwordValidation": {
+				"strong": false,
+				"minimumLength": 8,
+				"uniqueCharacters": 4,
+				"digitsAndSymbols": 2,
+				"upperAndLowerCase": false
+			}
+		},
+		"captchaSettings": {
+			"captchaType": 0,
+			"siteKey": "",
+			"secretKey": "",
+			"passesCount": 5
+		},
+		"emailSettings": {
+			"fromEmail": "",
+			"usePHPDefinedSMTP": false,
+			"useBuiltInMailer": false,
+			"SMTPServer": "localhost",
+			"SMTPPort": 25,
+			"SMTPUser": "",
+			"SMTPPassword": "",
+			"securityProtocol": 0,
+			"provider": 0,
+			"oauthUserEmail": "",
+			"oauthSettingsJson": "",
+			"oauthClientId": "",
+			"oauthClientSecret": "",
+			"oauthTenantId": ""
+		},
+		"advancedSecurity": {
+			"allowGuestLogin": false
+		},
+		"auditAndLocking": {
+			"loggingMode": 0,
+			"loggingTable": {
+				"connId": "",
+				"table": ""
+			},
+			"loggingFile": "audit.log",
+			"logSecurityActions": false,
+			"lockAfterUnsuccessfulLogin": false,
+			"enableLocking": false,
+			"lockingTable": {
+				"connId": "",
+				"table": ""
+			},
+			"tables": {}
+		},
+		"twoFactorSettings": {
+			"available": false,
+			"required": false,
+			"enable": true,
+			"remember": true,
+			"types": {},
+			"twoFactorField": "",
+			"emailField": "",
+			"phoneField": "",
+			"codeField": "",
+			"projectName": ""
+		},
+		"staticPermissions": {
+			"groups": {}
+		}
+	},
+	"dbConnections": [
+		{
+			"id": "conn",
+			"name": "amis_local_db at localhost",
+			"type": 4,
+			"connString": "postgre;localhost;dxmacbook05;password;;amis_local_db;;1;{\"ssl\":false};0"
+		}
+	],
+	"defaultConnID": "conn",
+	"menus": [
+		{
+			"id": "main",
+			"root": {
+				"children": [
+					{
+						"id": "1",
+						"data": {
+							"name": {
+								"table": "public.accounting_rapid_users",
+								"type": 6
+							},
+							"itemType": 2,
+							"linkType": 0,
+							"iconType": 2,
+							"iconName": "glyphicon-leaf",
+							"showIconType": 2,
+							"table": 942436689,
+							"pageType": "list"
+						}
+					}
+				]
+			}
+		}
+	],
+	"globalPages": [
+		{
+			"id": "menu",
+			"type": "menu",
+			"layoutId": "topbar",
+			"disabled": false,
+			"default": 0,
+			"forms": {
+				"above-grid": {
+					"modelId": "empty-above-grid",
+					"grid": [
+						{
+							"cells": [
+								{
+									"cell": "c1"
+								}
+							],
+							"section": ""
+						}
+					],
+					"cells": {
+						"c1": {
+							"model": "c1",
+							"items": []
+						}
+					},
+					"deferredItems": [],
+					"recsPerRow": 1
+				},
+				"supertop": {
+					"modelId": "menu-topbar-menu",
+					"grid": [
+						{
+							"cells": [
+								{
+									"cell": "c1"
+								},
+								{
+									"cell": "c2"
+								}
+							],
+							"section": ""
+						}
+					],
+					"cells": {
+						"c1": {
+							"model": "c1",
+							"items": [
+								"logo",
+								"menu"
+							]
+						},
+						"c2": {
+							"model": "c2",
+							"items": []
+						}
+					},
+					"deferredItems": [],
+					"recsPerRow": 1
+				},
+				"grid": {
+					"modelId": "welcome",
+					"grid": [
+						{
+							"cells": [
+								{
+									"cell": "c1"
+								}
+							],
+							"section": ""
+						}
+					],
+					"cells": {
+						"c1": {
+							"model": "c1",
+							"items": [
+								"welcome_item"
+							]
+						}
+					},
+					"deferredItems": [],
+					"recsPerRow": 1
+				}
+			},
+			"items": {
+				"logo": {
+					"type": "logo"
+				},
+				"menu": {
+					"type": "menu"
+				},
+				"welcome_item": {
+					"type": "welcome_item",
+					"linkUrl": "",
+					"linkTable": "public.accounting_rapid_users",
+					"linkPage": "list",
+					"linkText": {
+						"table": "public.accounting_rapid_users",
+						"type": 6
+					},
+					"linkIcon": {
+						"glyph": "leaf"
+					},
+					"linkComments": {
+						"text": "Accounting Rapid Users description",
+						"type": 0
+					},
+					"background": "#5f9ea0",
+					"linkType": 0
+				}
+			},
+			"version": 13,
+			"pageWidth": "full",
+			"imageItem": {
+				"type": "page_image"
+			},
+			"imageBgColor": "#f2f2f2",
+			"controlsBgColor": "transparent",
+			"imagePosition": "right",
+			"welcomePageStay": true,
+			"listTotals": 1,
+			"title": {},
+			"cardStyle": {},
+			"welcomeStyle": 3
+		}
+	],
+	"projectStyle": {
+		"theme": "obsidian",
+		"sidebarTheme": "legacy",
+		"topbarTheme": "legacy",
+		"logoTheme": "legacy",
+		"sidebarCustomThemeColor": "legacy",
+		"topbarCustomThemeColor": "legacy",
+		"logoCustomThemeColor": "legacy",
+		"gpHeaderBg": "legacy",
+		"gpHeaderColor": "legacy",
+		"gpFooterBg": "legacy",
+		"gpPanelBorder": "legacy",
+		"gpBorderColor": "legacy",
+		"gpInnerBorder": "legacy",
+		"gpInnerBorderColor": "legacy",
+		"gcOddBg": "legacy",
+		"gcOddColor": "legacy",
+		"gcEvenBg": "legacy",
+		"gcEvenColor": "legacy",
+		"gcRolloverHighlightBg": "legacy",
+		"gcRolloverHighlightColor": "legacy"
+	},
+	"messages": {},
+	"projectLogo": {},
+	"cookieBannerText": {}
+}

@@ -11,42 +11,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # STEP 1: I-download ang source code mula sa GitHub repository
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    # STEP 2: Secret Scanning (TruffleHog) - Hahanap ng credentials/passwords
     - name: Secret Scanning (TruffleHog)
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
         base: ""
 
-    # STEP 3: Semgrep (LASER FOCUS sa SQL Injection Lang na may Kumpletong Detalye)
-    - name: Run Semgrep (SQLi Only)
+    # STEP 3: Semgrep (Advanced Multi-Vulnerability Filter)
+    - name: Run Semgrep (SQLi, XSS, & Command Injection Only)
       run: |
-        # Patakbuhin si Semgrep at i-save ang buong text report
         docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan \
           --config="p/php" \
           --text \
           > semgrep_results.txt || true
         
-        echo "=== SQL INJECTION SCAN RESULTS ==="
+        echo "=== ADVANCED SECURITY SCAN RESULTS ==="
         
-        # Titingnan kung may 'tainted-sql-string' sa resulta
-        if grep -q "tainted-sql-string" semgrep_results.txt; then
-          echo "❌ ERROR: May nakitang SQL Injection sa code mo!"
+        # Hahanapin ang alinman sa tatlong kritikal na security flaws na ito
+        if egrep -q "tainted-sql-string|command-injection|cross-site-scripting" semgrep_results.txt; then
+          echo "❌ ERROR: May natagpuang kritikal na Security Vulnerability!"
           echo "--------------------------------------------------------"
           
-          # Hahanapin ang bawat block ng SQL Injection at ipapakita ang detalye (30 lines after ng filename)
-          grep -B 1 -A 25 "tainted-sql-string" semgrep_results.txt
+          # Iluluwa ang buong detalye kung nasaan ang error
+          egrep -B 1 -A 25 "tainted-sql-string|command-injection|cross-site-scripting" semgrep_results.txt
           
           echo "--------------------------------------------------------"
-          echo "Aksyon: Pakiaayos ang query sa itaas bago mag-deploy."
+          echo "Aksyon: Ayusin ang code sa itaas bago payagang mag-deploy."
           exit 1
         else
-          echo "✅ SQL Injection Scan Passed! Ligtas ang custom code mo."
+          echo "✅ Security Scan Passed! Ligtas ang custom code mo sa SQLi, XSS, at Command Injection."
           exit 0
         fi

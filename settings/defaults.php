@@ -73,8 +73,8 @@ $runnerProjectDefaults = array(
 				'__meta__' => 0,
 				'__object__' => array(
 					'lifeTime' => 15,
-					'sessionName' => 'LrmLIWUKw0VNbrjZNk75',
-					'JWTSecret' => 'JO5zBo2sU32wkGygbqME' 
+					'sessionName' => '4lFARna6Lqdb7OEGnix6',
+					'JWTSecret' => 'H6sYWsGAk9jDsdEwSKsI' 
 				) 
 			),
 			'registration' => array(

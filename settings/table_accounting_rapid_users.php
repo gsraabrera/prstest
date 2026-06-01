@@ -593,6 +593,7 @@ FROM
 		'orderBySql' => '',
 		'tailSql' => '' 
 	),
+	'hasEvents' => true,
 	'originalTable' => 'public.accounting_rapid_users',
 	'originalPagesByType' => array(
 		'add' => array( 

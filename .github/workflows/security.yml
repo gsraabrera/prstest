@@ -1,4 +1,4 @@
-name: PHPRunner Security Scan (Semgrep)
+name: PHPRunner Security Scan
 
 on:
   push:
@@ -7,28 +7,31 @@ on:
     branches: [ "main" ]
 
 jobs:
-  security-scan:
+  security-audit:
     runs-on: ubuntu-latest
 
     steps:
-    # STEP 1: I-download ang code mula sa GitHub
+    # STEP 1: I-download ang source code mula sa GitHub repository
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    # STEP 2: Secret Scanning (TruffleHog) - Hahanap ng passwords/credentials
+    # STEP 2: Secret Scanning (TruffleHog)
+    # Hahanapin nito kung may mga naiwang database passwords o API keys sa connection settings
     - name: Secret Scanning (TruffleHog)
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
-        base: ""
+        base: "" # I-scan ang buong kasaysayan ng commits
 
-    # STEP 3: Semgrep Security Scan (Dito natin huhulihin ang SQL Injection)
-    - name: Run Semgrep (SQLi & Security Audit)
-      run: |
-        docker run --rm -v "${{ github.workspace }}:/src" returntocorp/semgrep semgrep scan \
-          --config="p/php" \
-          --config="p/owasp-top-10" \
-          --include="include" \
-          --error
+    # STEP 3: Semgrep Security Scan (Dito mahuhuli ang SQL Injection)
+    # Gagamitin ang opisyal na Semgrep engine para i-audit ang PHP custom events mo.
+    # Babagsak (Failure) ang workflow na ito kapag may nakitang seryosong security flaw.
+    - name: Run Semgrep (SQLi & Vulnerability Detection)
+      uses: semgrep/semgrep-action@v1
+      with:
+        config: >-
+          p/php
+          p/owasp-top-10
+          p/security-audit

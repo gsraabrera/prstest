@@ -3,7 +3,7 @@ class eventclass_accounting_rapid_users  extends TableEventsBase {
 	
 	function init() {
 		$this->events = array(
-	'CopyOnLoad' => true 
+	 
 );
 		$this->fieldValues = array(
 	'filterLimit' => array(
@@ -38,14 +38,7 @@ class eventclass_accounting_rapid_users  extends TableEventsBase {
 	) 
 );
 			}
-		function CopyOnLoad( &$values, &$where, $pageObject ) {
-		// Place event code here.
-// Use "Add Action" button to add code snippets.
-
-$values['active'] = "test"
-		;
-		
-	}
+	
 		
 
 }

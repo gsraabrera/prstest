@@ -2,9 +2,9 @@ name: PHPRunner Security Scan
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "test" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "test" ]
 
 jobs:
   phprunner-scan:
@@ -17,36 +17,34 @@ jobs:
       with:
         fetch-depth: 0
 
-    # STEP 2: Secret Scanning (TruffleHog) - Bantayan ang mga database passwords sa connections ng PHPRunner
+    # STEP 2: Secret Scanning (TruffleHog) - Para sa database passwords
     - name: Secret Scanning (TruffleHog)
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
+        base: "" # Ini-scan ang buong repository history
 
     # STEP 3: Setup PHP Environment
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.1' # Madalas 8.1 o 8.2 ang gamit ng PHPRunner ngayon
+        php-version: '8.1'
         coverage: none
+        tools: phpstan # Dito natin ilalagay para si shivammathur na ang bahalang mag-ayos ng PATH!
 
-    # STEP 4: I-install ang PHPStan (Dahil walang composer.json ang output ng PHPRunner, i-i-install natin ito globally)
-    - name: Install PHPStan
-      run: composer global require phpstan/phpstan --no-progress
-
-    # STEP 5: Patakbuhin ang Sniper Scan sa mga Custom Events at Functions mo lang
+    # STEP 4: Patakbuhin ang Static Analysis sa mga Custom Events at Functions
     - name: Run Static Analysis on Custom Functions
       run: |
-        # Gagawa tayo ng configuration file para sabihing huwag i-scan ang buong repo, kundi ang custom elements lang
-        echo "parameters:" > phpstan.neon
-        echo "  level: 4" >> phpstan.neon
-        echo "  paths:" >> phpstan.neon
-        # Ituturo natin ang include folder kung saan naroon ang mga events at custom_functions.php
-        echo "    - include" >> phpstan.neon 
-        echo "  excludePaths:" >> phpstan.neon
-        # I-exclude natin ang mga auto-generated configuration at language files para hindi mag-error
-        echo "    - include/lang/*" >> phpstan.neon
-        echo "    - include/dal/*" >> phpstan.neon
+        # Gumawa ng malinis na phpstan.neon gamit ang heredoc para iwas indent errors
+        cat << 'EOF' > phpstan.neon
+        parameters:
+          level: 1
+          paths:
+            - include
+          excludePaths:
+            - include/lang/*
+            - include/dal/*
+        EOF
         
-        # Patakbuhin ang global phpstan package laban sa neon file natin
-        ~/.composer/vendor/bin/phpstan analyse
+        # Patakbuhin gamit ang tool na naka-setup na sa global path
+        phpstan analyse --error-format=github

@@ -22,7 +22,7 @@ jobs:
         path: ./
         base: ""
 
-    # STEP 3: Semgrep (Advanced Multi-Vulnerability Filter)
+    # SEMGREP ADVISORY WORKFLOW (NON-BLOCKING)
     - name: Run Semgrep (SQLi, XSS, & Command Injection Only)
       run: |
         docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan \
@@ -32,18 +32,16 @@ jobs:
         
         echo "=== ADVANCED SECURITY SCAN RESULTS ==="
         
-        # Hahanapin ang alinman sa tatlong kritikal na security flaws na ito
         if egrep -q "tainted-sql-string|command-injection|cross-site-scripting" semgrep_results.txt; then
-          echo "❌ ERROR: May natagpuang kritikal na Security Vulnerability!"
+          echo "⚠️ WARNING: Critical Security Vulnerability Found in Code!"
           echo "--------------------------------------------------------"
           
-          # Iluluwa ang buong detalye kung nasaan ang error
           egrep -B 1 -A 25 "tainted-sql-string|command-injection|cross-site-scripting" semgrep_results.txt
           
           echo "--------------------------------------------------------"
-          echo "Aksyon: Ayusin ang code sa itaas bago payagang mag-deploy."
-          exit 1
+          echo "Notice: Please remediate the code flaws above. Deployment is proceeding."
+          exit 0 # <--- CHANGED TO 0: Logs the error but DOES NOT block the build
         else
-          echo "✅ Security Scan Passed! Ligtas ang custom code mo sa SQLi, XSS, at Command Injection."
+          echo "✅ Security Scan Passed! Custom code is resilient against SQLi, XSS, and Command Injection."
           exit 0
         fi

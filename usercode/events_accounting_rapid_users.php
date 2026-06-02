@@ -43,20 +43,19 @@ class eventclass_accounting_rapid_users  extends TableEventsBase {
 // // Use "Add Action" button to add code snippets.
 
 // // --- SECURITY TEST START ---
-// // Kukuha ng input sa URL (Halimbawa: ?user=admin' OR '1'='1)
 $userInput = $_GET['user']; 
 
-// MALI: Diretsong idinikit ang input sa SQL string (SQL Injection Vulnerability)
+// Vulnerable
 $sql = "SELECT * FROM users WHERE username = '" . $userInput . "'"; 
 
-// // Patatakbuhin ang maruming query
+
 // CustomQuery($sql);
 // // --- SECURITY TEST END ---
 
 $userInput = $_GET['user'];
 $userStatus = 'Active';
 
-// Ligtas, madaling basahin, at walang concatenation (.)
+// safe
 $sql = "SELECT * FROM users WHERE username = :1 AND status = :2";
 
 // Ipinapasa ang mga variables ayon sa pagkakasunod-sunod ng numero
@@ -67,13 +66,13 @@ $userInput = $_GET['user'];
 $userStatus = 'Active';
 $userRole = 'Admin';
 
-// Mas madaling i-maintain kahit abutin ng 100 lines ang query mo
+// safe
 $sql = "SELECT * FROM users 
         WHERE username = :username 
           AND status = :status 
           AND role = :role";
 
-// Gumamit ng associative array para itugma ang mga pangalan
+// safe
 $rs = DB::Query($sql, array(
     ":username" => $userInput,
     ":status"   => $userStatus,
@@ -82,10 +81,10 @@ $rs = DB::Query($sql, array(
 
 
 // ==========================================
-// TEST 1: Sadyang XSS (Cross-Site Scripting)
+// TEST 1:  XSS (Cross-Site Scripting)
 // ==========================================
 $userInputXSS = $_GET['search'];
-echo "You searched for: " . $userInputXSS; // MALI: Diretsong nag-echo ng $_GET nang walang htmlspecialchars()
+echo "You searched for: " . $userInputXSS; // wrong: direct echo $_GET without htmlspecialchars()
 
 // ==========================================
 // TEST 2: Sadyang Command Injection

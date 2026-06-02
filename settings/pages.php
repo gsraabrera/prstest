@@ -1,11 +1,6 @@
 <?php
 $runnerPageInfo = array(
 	'allPages' => array(
-		'<global>' => array(
-			'menu' => array( 
-				'menu' 
-			) 
-		),
 		'public.accounting_rapid_users' => array(
 			'add' => array( 
 				'add' 
@@ -27,6 +22,11 @@ $runnerPageInfo = array(
 			),
 			'print' => array( 
 				'print' 
+			) 
+		),
+		'<global>' => array(
+			'menu' => array( 
+				'menu' 
 			) 
 		) 
 	),

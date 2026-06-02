@@ -22,30 +22,29 @@ jobs:
         path: ./
         base: ""
 
-    # SEMGREP WORKFLOW WITH CUSTOM PHPRUNNER DETECTORS
+    # SEMGREP WORKFLOW WITH FIXED PHPRUNNER SYNTAX DETECTORS
     - name: Run Semgrep (With PHPRunner Custom Rules)
       run: |
-        # 1. Gagawa tayo ng pansamantalang custom rule file para sa PHPRunner commands
+        # Re-writing the custom rule file using correct metavariable syntax
         cat << 'EOF' > phprunner_rules.yaml
         rules:
           - id: phprunner-sqli
             languages: [php]
             message: "⚠️ WARNING: Detected string concatenation inside a PHPRunner Database command. This is highly vulnerable to SQL Injection. Use parameterized bindings (e.g., :1, :2) instead."
             severity: WARNING
-            patterns:
-              - pattern-either:
-                  - pattern: DB::Query("..." . $... , ...)
-                  - pattern: DB::Exec("..." . $... , ...)
-                  - pattern: CustomQuery("..." . $... , ...)
-                  - pattern: db_query("..." . $... , ...)
+            pattern-either:
+              - pattern: DB::Query($QUERY . $VAR, ...)
+              - pattern: DB::Exec($QUERY . $VAR, ...)
+              - pattern: CustomQuery($QUERY . $VAR, ...)
+              - pattern: db_query($QUERY . $VAR, ...)
           - id: phprunner-xss
             languages: [php]
             message: "⚠️ WARNING: Direct echoing of raw HTTP request data detected. Use htmlspecialchars() or htmlentities() to prevent Cross-Site Scripting (XSS)."
             severity: WARNING
-            pattern: echo "..." . $...;
+            pattern: echo $TEXT . $VAR;
         EOF
 
-        # 2. Patatatakbuhin si Semgrep gamit ang official rules AT ang bagong phprunner_rules.yaml
+        # Patatatakbuhin si Semgrep gamit ang official rules AT ang bagong phprunner_rules.yaml
         docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan \
           --config="p/php" \
           --config="/src/phprunner_rules.yaml" \
@@ -54,7 +53,7 @@ jobs:
         
         echo "=== ADVANCED SECURITY SCAN RESULTS ==="
         
-        # 3. Pagsasama-samahin ang pagsala kasama ang bago nating nadiskubreng rules
+        # Pagsasama-samahin ang pagsala kasama ang bago nating nadiskubreng rules
         if egrep -q "tainted-sql-string|command-injection|cross-site-scripting|phprunner-sqli|phprunner-xss" semgrep_results.txt; then
           echo "⚠️ WARNING: Critical Security Vulnerability Found in Code!"
           echo "--------------------------------------------------------"

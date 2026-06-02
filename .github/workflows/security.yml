@@ -22,10 +22,10 @@ jobs:
         path: ./
         base: ""
 
-    # SEMGREP WORKFLOW WITH FIXED PHPRUNNER SYNTAX DETECTORS
+    # SEMGREP WORKFLOW (TAILORED TARGET SCANNING)
     - name: Run Semgrep (With PHPRunner Custom Rules)
       run: |
-        # Re-writing the custom rule file using correct metavariable syntax
+        # 1. Re-writing the custom rules with better naming definitions
         cat << 'EOF' > phprunner_rules.yaml
         rules:
           - id: phprunner-sqli
@@ -39,21 +39,24 @@ jobs:
               - pattern: db_query($QUERY . $VAR, ...)
           - id: phprunner-xss
             languages: [php]
-            message: "⚠️ WARNING: Direct echoing of raw HTTP request data detected. Use htmlspecialchars() or htmlentities() to prevent Cross-Site Scripting (XSS)."
+            message: "⚠️ WARNING: Direct echoing of raw concatenation detected. Ensure variables are protected with htmlspecialchars() to prevent XSS."
             severity: WARNING
             pattern: echo $TEXT . $VAR;
         EOF
 
-        # Patatatakbuhin si Semgrep gamit ang official rules AT ang bagong phprunner_rules.yaml
+        # 2. Tatakbo si Semgrep pero gagamit ng `--include` flags para i-focus lang ang analysis 
+        # sa mga folder kung saan nandoon ang custom code at custom hooks mo.
         docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan \
           --config="p/php" \
           --config="/src/phprunner_rules.yaml" \
+          --include="usercode/" \
+          --include="include/*_events.php" \
           --text \
           > semgrep_results.txt || true
         
         echo "=== ADVANCED SECURITY SCAN RESULTS ==="
         
-        # Pagsasama-samahin ang pagsala kasama ang bago nating nadiskubreng rules
+        # 3. Pagsasama-samahin ang pagsala kasama ang bago nating nadiskubreng rules
         if egrep -q "tainted-sql-string|command-injection|cross-site-scripting|phprunner-sqli|phprunner-xss" semgrep_results.txt; then
           echo "⚠️ WARNING: Critical Security Vulnerability Found in Code!"
           echo "--------------------------------------------------------"
